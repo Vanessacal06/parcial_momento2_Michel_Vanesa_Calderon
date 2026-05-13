@@ -1,6 +1,6 @@
 # =================================================================
 # PROYECTO: GESTOR DE GASTOS DE VEHÍCULOS
-# INTEGRACIÓN: ESTUDIANTE 1 Y ESTUDIANTE 2
+# INTEGRACIÓN FINAL CON MANEJO DE ERRORES
 # =================================================================
 
 # --- MÓDULO DE REGISTRO (Estudiante 2) ---
@@ -9,24 +9,67 @@ def registrar_gasto(gastos):
     print("      NUEVO REGISTRO")
     print("-"*30)
     
-    # Captura de datos básica
-    placa = input("Placa del vehiculo: ")
-    concepto = input("Concepto (Gasolina/Peaje/Otros): ")
+    # .strip() elimina espacios accidentales al inicio o final
+    placa = input("Placa del vehiculo: ").strip().upper()
+    concepto = input("Concepto (Gasolina/Peaje/Otros): ").strip().capitalize()
     
-    # Usamos float para permitir decimales en el dinero
-    valor = float(input("Valor del gasto: "))
-    
-    # Se crea el diccionario con los datos capturados
-    nuevo_registro = {
-        "placa": placa,
-        "concepto": concepto,
-        "valor": valor
-    }
-    
-    # Se guarda el diccionario en la lista global
-    gastos.append(nuevo_registro)
-    print("\n>>> Gasto guardado correctamente.")
+    # Manejo de errores para el valor numerico
+    try:
+        valor_input = input("Valor del gasto: ").strip()
+        valor = float(valor_input)
+        
+        nuevo_registro = {
+            "placa": placa,
+            "concepto": concepto,
+            "valor": valor
+        }
+        
+        gastos.append(nuevo_registro)
+        print("\n>>> Gasto guardado correctamente.")
+        
+    except ValueError:
+        print("\nERROR: El valor debe ser un numero (ejemplo: 50000 o 10.5).")
+        print("El registro ha sido cancelado por error de formato.")
 
+# --- MÓDULO DE CÁLCULOS (Estudiante 3) ---
+def mostrar_total_gastos(gastos):
+    if not gastos:
+        print("\n[!] No hay gastos registrados todavía.")
+        return
+
+    total = 0
+    print("\n" + "="*30)
+    print("   RESUMEN DE GASTOS")
+    print("="*30)
+    
+    for gasto in gastos:
+        total += gasto["valor"]
+        print(f"Vehiculo: {gasto['placa']} | Concepto: {gasto['concepto']} | Valor: ${gasto['valor']:,.2f}")
+    
+    print("-" * 30)
+    print(f"TOTAL ACUMULADO: ${total:,.2f}")
+    print("=" * 30)
+
+# --- MÓDULO DE BÚSQUEDA (Estudiante 4) ---
+def buscar_gasto_por_placa(gastos):
+    if not gastos:
+        print("\n[!] No hay datos para buscar.")
+        return
+
+    print("\n" + "-"*30)
+    print("    BUSCAR POR PLACA")
+    print("-"*30)
+    
+    placa_buscada = input("Ingrese la placa a buscar: ").strip().upper()
+    encontrado = False
+    
+    for gasto in gastos:
+        if gasto["placa"] == placa_buscada:
+            print(f">> Encontrado: {gasto['concepto']} | Valor: ${gasto['valor']:,.2f}")
+            encontrado = True
+    
+    if not encontrado:
+        print(f"No se encontraron registros para la placa: {placa_buscada}")
 
 # --- MENÚ DE INTERFAZ (Estudiante 1) ---
 def mostrar_menu():
@@ -34,39 +77,30 @@ def mostrar_menu():
     print("   SISTEMA DE GESTION - TRANSPORTES S.A.")
     print("========================================")
     print("1. Registrar Gasto")
-    print("2. Ver Total Gastado (Estudiante 3)")
-    print("3. Buscar por Placa (Estudiante 4)")
+    print("2. Ver Total Gastado")
+    print("3. Buscar por Placa")
     print("4. Salir")
     print("========================================")
 
-
 # --- FUNCIÓN PRINCIPAL ---
 def main():
-    # Lista donde se almacenarán todos los diccionarios de gastos
     gastos = [] 
     
     while True:
         mostrar_menu()
-        opcion = input("Seleccione una opcion: ")
+        opcion = input("Seleccione una opcion: ").strip()
 
         if opcion == "1":
-            # Llamamos a la función del Estudiante 2
             registrar_gasto(gastos)
-            
         elif opcion == "2":
-            print("\n[Aviso] Módulo de cálculos en desarrollo por Estudiante 3.")
-            
+            mostrar_total_gastos(gastos)
         elif opcion == "3":
-            print("\n[Aviso] Módulo de búsqueda en desarrollo por Estudiante 4.")
-            
+            buscar_gasto_por_placa(gastos)
         elif opcion == "4":
-            print("Saliendo del sistema...")
+            print("Cerrando el sistema... ¡Buen viaje!")
             break
-            
         else:
-            print("Opcion no valida, intente de nuevo.")
+            print("Opcion no valida, por favor elija entre 1 y 4.")
 
-
-# Ejecución del programa
 if __name__ == "__main__":
     main()
